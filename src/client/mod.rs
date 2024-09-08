@@ -1,17 +1,17 @@
 use std::net::TcpStream;
 
-use super::server::HOST;
-
 pub struct Client {
     connection: TcpStream,
 }
 
 impl Client {
-    pub fn new() -> Self {
-        let connection = TcpStream::connect(HOST).unwrap();
+    pub fn connect(host: &str) -> Self {
+        let connection = TcpStream::connect(host).unwrap();
 
         Self { connection }
     }
 
-    
+    pub fn get(&self, key: &str) {
+        // self.connection.
+    }    
 }

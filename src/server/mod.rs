@@ -1,40 +1,36 @@
 use std::collections::HashMap;
 
-use parse::Frame;
-use tokio::net::TcpStream;
-
 mod parse;
 
 pub const HOST: &str = "127.0.0.1:6173";
 
-pub struct Db<K, V> {
-    records: HashMap<K, V>,
+pub struct Db {
+    records: HashMap<String, String>,
 }
 
-impl Db<String, String> {
+impl Db {
     pub fn new() -> Self {
         Self {
             records: HashMap::new(),
         }
     }
+
+    pub async fn get(&self, key: &str) -> Option<String> {
+            let data = self.records.get(key);
+
+            if let Some(value) = data {
+                return Some(value.clone());
+            }
+            None
+    }
     
-    pub async fn process(&self, socket: TcpStream) {
-        let mut data = Frame::new(socket);
 
-        data.parse_tcp_stream().await;
-
-        println!("{}", data.value.unwrap());
+    pub async fn set(&mut self, key: String, value: String) -> Option<()> {
+        self.records.insert(key, value);
+        Some(())
     }
 
-
-    pub async fn start_server(&self) {
-        let listener = tokio::net::TcpListener::bind(HOST).await.unwrap();
-        println!("Server on {}", listener.local_addr().unwrap());
-
-        loop {
-            let (socket, _) = listener.accept().await.unwrap();
-            self.process(socket).await;
-        }
+    pub async fn delete(&mut self, key: &str) -> Option<String> {
+        self.records.remove(key)
     }
-
 }

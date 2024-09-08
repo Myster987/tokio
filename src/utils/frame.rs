@@ -2,17 +2,21 @@ use tokio::{
     io::AsyncReadExt, net::TcpStream
 };
 
-pub struct Frame {}
+pub enum Frame {
+    Simple(String)
+}
 
 impl Frame {
     pub fn new() -> Self {
-        Self {}
+        Self::Simple(String::new())
     }
 
-    pub async fn parse_stream_to_string(stream: &mut TcpStream) -> String {
+    pub async fn parse_stream_to_string(&mut self, stream: &mut TcpStream) -> String {
         let mut request_string = String::new();
 
         stream.read_to_string(&mut request_string).await;
+
+        self::Frame::Simple(request_string.clone());
 
         request_string
     }
